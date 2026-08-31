@@ -1,0 +1,18 @@
+#ifndef C_SNAKE_GAME_UPDATER_DEFS_H
+#define C_SNAKE_GAME_UPDATER_DEFS_H
+
+#define GRID_WIDTH 20
+#define GRID_HEIGHT 20
+#define START_SNAKE_LENGTH 4
+
+typedef enum
+{
+    CELL_EMPTY = 0,
+    CELL_SNAKE_HEAD,
+    CELL_SNAKE_BODY,
+    CELL_FOOD,
+    CELL_WALL,
+    CELL_COUNT // Bounds check
+} CellType;
+
+#endif // C_SNAKE_GAME_UPDATER_DEFS_H

@@ -3,12 +3,13 @@
 int main(void)
 {
     Renderer r;
+
     renderer_tui_create(&r);
 
-    if (r.ops->init(&r) == 0)
+    if (renderer_init(&r) == 0)
     {
-        r.ops->print(&r);
-        r.ops->shutdown(&r);
+        renderer_render(&r);
+        renderer_shutdown(&r);
     }
 
     return 0;
