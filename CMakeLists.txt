@@ -1,48 +1,39 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.25)
 
-project(c-snake-game C)
+project(
+    c_snake_game
+    VERSION 0.1.0
+    DESCRIPTION "C Snake Game"
+    LANGUAGES C
+)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-option(ENABLE_SANITIZERS "Enable AddressSanitizer and UBSan in Debug builds (GCC/Clang)" ON)
+enable_testing()
 
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Debug)
-endif()
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-add_executable(${PROJECT_NAME})
+include(CompilerWarnings)
+include(Sanitizers)
 
-file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.c")
-target_sources(${PROJECT_NAME} PRIVATE ${SOURCES})
-target_include_directories(${PROJECT_NAME} PRIVATE include)
+add_executable(${PROJECT_NAME}
+    src/main.c
+    src/renderer/renderer_tui.c
+    src/updater/updater.c
+)
 
-if(MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE
-        $<$<CONFIG:Debug>: /W4 /WX /Zi /Od /RTC1>
-        $<$<CONFIG:Release>: /W4 /WX /O2 /GL /DNDEBUG>
-    )
-    target_link_options(${PROJECT_NAME} PRIVATE
-        $<$<CONFIG:Release>:/LTCG>
-    )
-else()
-    set(DEBUG_SANITIZER_COMPILE_FLAGS "")
-    set(DEBUG_SANITIZER_LINK_FLAGS "")
+target_include_directories(${PROJECT_NAME}
+    PRIVATE
+        ${PROJECT_SOURCE_DIR}/include
+)
 
-    if(ENABLE_SANITIZERS)
-        set(DEBUG_SANITIZER_COMPILE_FLAGS -fsanitize=address,undefined -fno-omit-frame-pointer)
-        set(DEBUG_SANITIZER_LINK_FLAGS -fsanitize=address,undefined)
-    endif()
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        project_warnings
+        project_sanitizers
+)
 
-    target_compile_options(${PROJECT_NAME} PRIVATE
-        $<$<CONFIG:Debug>: -Wall -Wextra -Werror -g -O0 -DDEBUG_BUILD
-        ${DEBUG_SANITIZER_COMPILE_FLAGS}>
-        $<$<CONFIG:Release>: -O3 -DNDEBUG>
-    )
-    target_link_options(${PROJECT_NAME} PRIVATE
-        $<$<CONFIG:Debug>: ${DEBUG_SANITIZER_LINK_FLAGS}>
-        $<$<CONFIG:Release>: -s>
-    )
-endif()
-
-message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+add_subdirectory(tests)
