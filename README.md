@@ -65,3 +65,7 @@ cmake --build build --config Release
 ```
 
 The executable will then be under the corresponding configuration directory.
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
