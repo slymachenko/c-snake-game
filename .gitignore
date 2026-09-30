@@ -1,1 +1,6 @@
-build/
+# Local directory
+/local/
+
+# Build directories
+/build/
+/build-*/
