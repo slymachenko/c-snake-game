@@ -1,57 +1,67 @@
 # c-snake-game
 
-A cross-platform TUI-based snake game written in pure C11 from scratch.
+A cross-platform TUI-based Snake game written in C11.
 
 ## Requirements
 
-- [Git](https://git-scm.com/downloads)
-- [CMake](https://cmake.org/cmake/help/latest/command/install.html)
-- C compiler/toolchain supported by CMake (e.g. GCC/Clang/MSVC)
+* [Git](https://git-scm.com/downloads)
+* [CMake](https://cmake.org/download/)
+* A C11-compatible compiler (e.g. [GCC](https://gcc.gnu.org/)/[Clang](https://clang.llvm.org/))
 
 ## Setup
 
-### Debug
-
-Enables all warnings, debug symbols, and sanitizers.
+Clone the repository:
 
 ```bash
 git clone https://github.com/slymachenko/c-snake-game.git
 cd c-snake-game
+```
+
+### Debug
+
+Configure and build a debug version:
+
+```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
 cmake --build build
 ```
 
-> [!NOTE]
-> Sanitizer runtime libraries must be installed:
->
-> - Fedora/RHEL: `sudo dnf install libasan libubsan`
-> - Debian/Ubuntu: `sudo apt install libasan8 libubsan1`
->
-> To build without sanitizers: `cmake -S . -B build -DENABLE_SANITIZERS=OFF`
+To enable sanitizers:
+
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DENABLE_SANITIZERS=ON
+cmake --build build
+```
 
 ### Release
 
-Fully optimized, stripped binary ready for distribution.
+Configure and build a release version:
 
 ```bash
-git clone https://github.com/slymachenko/c-snake-game.git
-cd c-snake-game
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ```
 
-> [!NOTE]
-> On multi-config generators (e.g. Visual Studio), omit `-DCMAKE_BUILD_TYPE` and use `--config` at build time:
->
-> ```bash
-> cmake -S . -B build
-> cmake --build build --config Release
-> ```
+## Run
 
-## Running
+After building, run the executable:
 
-The built executable is located at:
+### Linux / macOS
 
-- Linux/macOS: `build/c-snake-game`
-- Windows (Makefiles/Ninja): `build/c-snake-game.exe`
-- Windows (Visual Studio): `build/Debug/c-snake-game.exe` or `build/Release/c-snake-game.exe`
+```bash
+./build/c-snake-game
+```
+
+### Windows
+
+```powershell
+.\build\c-snake-game.exe
+```
+
+With Visual Studio or another multi-config generator, specify the configuration:
+
+```bash
+cmake --build build --config Release
+```
+
+The executable will then be under the corresponding configuration directory.
