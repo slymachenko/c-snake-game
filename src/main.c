@@ -6,8 +6,7 @@ int main(void)
 
     renderer_tui_create(&r);
 
-    if (renderer_init(&r) == 0)
-    {
+    if (renderer_init(&r) == 0) {
         renderer_render(&r);
         renderer_shutdown(&r);
     }

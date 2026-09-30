@@ -5,8 +5,7 @@
 #define GRID_HEIGHT 20
 #define START_SNAKE_LENGTH 4
 
-typedef enum
-{
+typedef enum {
     CELL_EMPTY = 0,
     CELL_SNAKE_HEAD,
     CELL_SNAKE_BODY,

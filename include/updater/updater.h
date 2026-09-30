@@ -6,8 +6,7 @@
 
 typedef struct Updater Updater;
 
-typedef struct UpdaterOps
-{
+typedef struct UpdaterOps {
     int (*init)(Updater *self);
     int (*update)(Updater *self, u32 x, u32 y, u8 cell_type);
     int (*shutdown)(Updater *self);

@@ -13,8 +13,7 @@ static const char CELL_MAP[CELL_COUNT] = {
     [CELL_WALL] = '#',
 };
 
-typedef struct
-{
+typedef struct {
     CellType grid[TUI_HEIGHT][TUI_WIDTH];
 } TuiData;
 
@@ -22,13 +21,11 @@ static TuiData s_tui_data;
 
 static int tui_init(Renderer *self)
 {
-    if (!self)
-    {
+    if (!self) {
         return -1;
     }
 
-    if (self->impl)
-    {
+    if (self->impl) {
         return 0;
     }
 
@@ -45,8 +42,7 @@ static int tui_draw_cell(Renderer *self, u32 x, u32 y, u8 cell_type)
 {
     TuiData *data = (TuiData *)self->impl;
 
-    if (x >= GRID_WIDTH || y >= GRID_HEIGHT)
-    {
+    if (x >= GRID_WIDTH || y >= GRID_HEIGHT) {
         return -1;
     }
 
@@ -66,10 +62,8 @@ static int tui_render(Renderer *self)
 
     fputs("\033[H", stdout);
 
-    for (u32 y = 0; y < TUI_HEIGHT; ++y)
-    {
-        for (u32 x = 0; x < TUI_WIDTH; ++x)
-        {
+    for (u32 y = 0; y < TUI_HEIGHT; ++y) {
+        for (u32 x = 0; x < TUI_WIDTH; ++x) {
             putchar(CELL_MAP[data->grid[y][x]]);
         }
         putchar('\n');
@@ -94,13 +88,11 @@ static int tui_clear(Renderer *self)
 
 static int tui_shutdown(Renderer *self)
 {
-    if (!self)
-    {
+    if (!self) {
         return -1;
     }
 
-    if (!self->impl)
-    {
+    if (!self->impl) {
         return 0;
     }
 

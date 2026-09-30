@@ -6,8 +6,7 @@
 
 typedef struct Renderer Renderer;
 
-typedef struct RendererOps
-{
+typedef struct RendererOps {
     int (*init)(Renderer *self);
     int (*draw_cell)(Renderer *self, u32 x, u32 y, u8 cell_type);
     int (*render)(Renderer *self);
@@ -15,8 +14,7 @@ typedef struct RendererOps
     int (*shutdown)(Renderer *self);
 } RendererOps;
 
-struct Renderer
-{
+struct Renderer {
     const RendererOps *ops;
     void *impl;
 };
@@ -28,7 +26,9 @@ static inline int renderer_init(Renderer *r)
 
 static inline int renderer_draw_cell(Renderer *r, u32 x, u32 y, u8 cell_type)
 {
-    return (r && r->ops && r->ops->draw_cell) ? r->ops->draw_cell(r, x, y, cell_type) : -1;
+    return (r && r->ops && r->ops->draw_cell)
+               ? r->ops->draw_cell(r, x, y, cell_type)
+               : -1;
 }
 
 static inline int renderer_render(Renderer *r)
