@@ -1,13 +1,31 @@
 ---
 Language: Cpp
-
 BasedOnStyle: LLVM
+ColumnLimit: 100
 
+# Indentation
 IndentWidth: 4
 TabWidth: 4
 UseTab: Never
+IndentCaseLabels: false
 
+# Alignment and Pointers
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+AlignOperands: false
+AlignTrailingComments: false
+PointerAlignment: Right
+
+# Braces and Short Blocks
 BreakBeforeBraces: Linux
+AllowShortBlocksOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+RemoveBracesLLVM: true
 
+# Line Wrapping and Packing
 BinPackArguments: false
 BinPackParameters: false
+BreakBeforeTernaryOperators: true

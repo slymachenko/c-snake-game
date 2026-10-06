@@ -1,49 +1,51 @@
 #ifndef C_SNAKE_GAME_RENDERER_H
 #define C_SNAKE_GAME_RENDERER_H
 
-#include "base/base_defs.h"
 #include "updater/updater_defs.h"
 
-typedef struct Renderer Renderer;
+struct renderer;
 
-typedef struct RendererOps {
-    int (*init)(Renderer *self);
-    int (*draw_cell)(Renderer *self, u32 x, u32 y, u8 cell_type);
-    int (*render)(Renderer *self);
-    int (*clear)(Renderer *self);
-    int (*shutdown)(Renderer *self);
-} RendererOps;
-
-struct Renderer {
-    const RendererOps *ops;
-    void *impl;
+struct renderer_vtable {
+    int (*init)(struct renderer *self);
+    int (*set_cell)(struct renderer *self, struct point_2d p, enum cell_type new_type);
+    int (*render)(struct renderer *self);
+    int (*clear)(struct renderer *self);
+    int (*shutdown)(struct renderer *self);
 };
 
-static inline int renderer_init(Renderer *r)
+struct renderer {
+    const struct renderer_vtable *vtable;
+    void *impl; // Implementation-specific struct
+};
+
+// To be called once before the game loop starts
+static inline int renderer_init(struct renderer *r)
 {
-    return (r && r->ops && r->ops->init) ? r->ops->init(r) : -1;
+    return (r && r->vtable && r->vtable->init) ? r->vtable->init(r) : -1;
 }
 
-static inline int renderer_draw_cell(Renderer *r, u32 x, u32 y, u8 cell_type)
+// Update the internal buffer for a single cell
+static inline int renderer_set_cell(struct renderer *r, struct point_2d p, enum cell_type new_type)
 {
-    return (r && r->ops && r->ops->draw_cell)
-               ? r->ops->draw_cell(r, x, y, cell_type)
-               : -1;
+    return (r && r->vtable && r->vtable->set_cell) ? r->vtable->set_cell(r, p, new_type) : -1;
 }
 
-static inline int renderer_render(Renderer *r)
+// Visualize current state
+static inline int renderer_render(struct renderer *r)
 {
-    return (r && r->ops && r->ops->render) ? r->ops->render(r) : -1;
+    return (r && r->vtable && r->vtable->render) ? r->vtable->render(r) : -1;
 }
 
-static inline int renderer_clear(Renderer *r)
+// Reset visualization
+static inline int renderer_clear(struct renderer *r)
 {
-    return (r && r->ops && r->ops->clear) ? r->ops->clear(r) : -1;
+    return (r && r->vtable && r->vtable->clear) ? r->vtable->clear(r) : -1;
 }
 
-static inline int renderer_shutdown(Renderer *r)
+/// To be called once before the exit
+static inline int renderer_shutdown(struct renderer *r)
 {
-    return (r && r->ops && r->ops->shutdown) ? r->ops->shutdown(r) : -1;
+    return (r && r->vtable && r->vtable->shutdown) ? r->vtable->shutdown(r) : -1;
 }
 
 #endif // C_SNAKE_GAME_RENDERER_H

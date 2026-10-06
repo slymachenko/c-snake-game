@@ -1,8 +1,8 @@
 #include "renderer/renderer_tui.h"
 #include "base/base_defs.h"
+#include "renderer/renderer.h"
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 static const char CELL_MAP[CELL_COUNT] = {
@@ -13,106 +13,104 @@ static const char CELL_MAP[CELL_COUNT] = {
     [CELL_WALL] = '#',
 };
 
-typedef struct {
-    CellType grid[TUI_HEIGHT][TUI_WIDTH];
-} TuiData;
+static struct tui_impl {
+    enum cell_type grid[TUI_HEIGHT][TUI_WIDTH];
+} s_tui_impl;
 
-static TuiData s_tui_data;
+static const struct renderer_vtable TUI_RENDERER_VTABLE;
 
-static int tui_init(Renderer *self)
+static int tui_init(struct renderer *self)
 {
-    if (!self) {
-        return -1;
-    }
-
-    if (self->impl) {
+    // Assign implementation
+    if (self->impl)
         return 0;
-    }
 
-    self->impl = &s_tui_data;
+    self->impl = &s_tui_impl;
 
-    // Clean grid and terminal
-    self->ops->clear(self);
-    fputs("\033[2J\033[H", stdout);
-
-    return 0;
-}
-
-static int tui_draw_cell(Renderer *self, u32 x, u32 y, u8 cell_type)
-{
-    TuiData *data = (TuiData *)self->impl;
-
-    if (x >= GRID_WIDTH || y >= GRID_HEIGHT) {
+    // Clear grid and terminal
+    self->vtable->clear(self);
+    if (fputs("\033[2J\033[H", stdout) == EOF)
         return -1;
-    }
-
-    data->grid[y][x * 3] = (CellType)CELL_EMPTY;
-    data->grid[y][(x * 3) + 1] = (CellType)cell_type;
-    data->grid[y][(x * 3) + 2] = (CellType)CELL_EMPTY;
 
     return 0;
 }
 
-static int tui_render(Renderer *self)
+static int tui_set_cell(struct renderer *self, struct point_2d p, enum cell_type new_type)
+{
+    struct tui_impl *data = (struct tui_impl *)self->impl;
+
+    if (p.x >= GRID_WIDTH || p.y >= GRID_HEIGHT)
+        return -1;
+
+    size_t x_offset = (size_t)p.x * 3;
+    size_t y_offset = (size_t)p.y;
+
+    data->grid[y_offset][x_offset] = (enum cell_type)CELL_EMPTY;
+    data->grid[y_offset][x_offset + 1] = (enum cell_type)new_type;
+    data->grid[y_offset][x_offset + 2] = (enum cell_type)CELL_EMPTY;
+
+    return 0;
+}
+
+static int tui_render(struct renderer *self)
 {
     if (!self || !self->impl)
         return -1;
 
-    TuiData *data = (TuiData *)self->impl;
+    struct tui_impl *data = (struct tui_impl *)self->impl;
 
-    fputs("\033[H", stdout);
+    if (fputs("\033[H", stdout) == EOF)
+        return -1;
 
     for (u32 y = 0; y < TUI_HEIGHT; ++y) {
-        for (u32 x = 0; x < TUI_WIDTH; ++x) {
+        for (u32 x = 0; x < TUI_WIDTH; ++x)
             putchar(CELL_MAP[data->grid[y][x]]);
-        }
         putchar('\n');
     }
 
-    fflush(stdout);
+    if (fflush(stdout) != 0)
+        return -1;
 
     return 0;
 }
 
-static int tui_clear(Renderer *self)
+static int tui_clear(struct renderer *self)
 {
     if (!self || !self->impl)
         return -1;
 
-    TuiData *data = (TuiData *)self->impl;
+    struct tui_impl *data = (struct tui_impl *)self->impl;
 
-    memset(data->grid, CELL_EMPTY, sizeof(data->grid));
+    memset(data->grid, 0, sizeof(data->grid));
 
     return 0;
 }
 
-static int tui_shutdown(Renderer *self)
+static int tui_shutdown(struct renderer *self)
 {
-    if (!self) {
+    if (!self)
         return -1;
-    }
 
-    if (!self->impl) {
+    if (!self->impl)
         return 0;
-    }
 
     self->impl = NULL;
 
     return 0;
 }
 
-static const RendererOps TUI_OPS = {
+static const struct renderer_vtable TUI_RENDERER_VTABLE = {
     .init = tui_init,
-    .draw_cell = tui_draw_cell,
+    .set_cell = tui_set_cell,
     .render = tui_render,
     .clear = tui_clear,
     .shutdown = tui_shutdown,
 };
 
-int renderer_tui_create(Renderer *r)
+int tui_renderer_create(struct renderer *self)
 {
-    memset(r, 0, sizeof(Renderer));
-    r->ops = &TUI_OPS;
+    memset(self, 0, sizeof(struct renderer));
 
+    self->vtable = &TUI_RENDERER_VTABLE;
     return 0;
 }

@@ -1,10 +1,11 @@
+#include "renderer/renderer.h"
 #include "renderer/renderer_tui.h"
 
 int main(void)
 {
-    Renderer r;
+    struct renderer r;
 
-    renderer_tui_create(&r);
+    tui_renderer_create(&r);
 
     if (renderer_init(&r) == 0) {
         renderer_render(&r);

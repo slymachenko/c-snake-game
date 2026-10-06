@@ -1,15 +1,14 @@
 #ifndef C_SNAKE_GAME_UPDATER_H
 #define C_SNAKE_GAME_UPDATER_H
 
-#include "base/base_defs.h"
 #include "updater/updater_defs.h"
 
-typedef struct Updater Updater;
+struct updater;
 
-typedef struct UpdaterOps {
-    int (*init)(Updater *self);
-    int (*update)(Updater *self, u32 x, u32 y, u8 cell_type);
-    int (*shutdown)(Updater *self);
-} UpdaterOps;
+struct updater_vtable {
+    int (*init)(struct updater *self);
+    int (*update)(struct updater *self, struct point_2d p, enum cell_type new_type);
+    int (*shutdown)(struct updater *self);
+};
 
 #endif // C_SNAKE_GAME_UPDATER_H
